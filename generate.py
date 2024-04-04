@@ -25,14 +25,36 @@ def generate_sample(model, tokenizer, conditions, max_length):
             # Generate one token at a time, and append it to the input to do generation iteratively until </s> is generated
             ### YOUR CODE HERE ###
 
-            outputs = model(input_ids)
-            next_token_logits = outputs[0][0, -1, :]  
-            next_token_id = torch.argmax(next_token_logits, dim=-1).item()
+            # outputs = model(input_ids)
+            # next_token_logits = outputs[0][0, -1, :]  
+            # next_token_id = torch.argmax(next_token_logits, dim=-1).item()
 
-            if next_token_id == tokenizer.eos_token_id:
+            # # if next_token_id == tokenizer.eos_token_id:
+            # #     break
+
+            # input_ids = torch.cat([input_ids, torch.tensor([[next_token_id]]).cuda()], dim=-1)
+
+            # if next_token_id == tokenizer.special_token_id:
+            #     break
+
+
+
+            # logits = model(input_ids)
+            # next_token_logits = logits[0, -1, :]
+            # next_token_id = torch.argmax(next_token_logits, dim=-1).unsqueeze(-1)
+            # input_ids = torch.cat([input_ids, next_token_id], dim=-1)
+
+            # # Check if the generated token is a special token indicating the end of the sequence
+            # if next_token_id.item() == tokenizer.special_token_id:
+            #     break
+
+
+            logits = model(input_ids)[0]
+            next = logits[:, -1, :].argmax(-1)
+            input_ids = torch.cat([input_ids, next.unsqueeze(-1)], dim=-1)
+
+            if next.item() == tokenizer.get_vocab()["</s>"]:
                 break
-
-            input_ids = torch.cat([input_ids, torch.tensor([[next_token_id]]).cuda()], dim=-1)
 
 
             ### YOUR CODE HERE ###
